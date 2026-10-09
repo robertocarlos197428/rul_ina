@@ -1,0 +1,22 @@
+﻿# Datos originales: no subir a Git
+/data/raw_femto/
+/data/raw_xjtu/
+
+# Entornos virtuales
+.venv/
+venv/
+
+# Caché de Python
+__pycache__/
+*.py[cod]
+
+# Secretos y variables de entorno
+.env
+.env.*
+
+# Configuración local del editor
+.vscode/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
