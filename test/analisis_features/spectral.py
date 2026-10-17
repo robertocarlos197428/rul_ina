@@ -1,85 +1,153 @@
-import os
+
+from pathlib import Path
+
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 
-# Configuración de estilo visual limpio
-plt.style.use('seaborn-v0_8-whitegrid')
-plt.rcParams['font.sans-serif'] = 'DejaVu Sans'
 
-# 1. Cargar el archivo procesado desde la ruta original
-input_path = r"C:\Users\emaker\Downloads\RUL\rul_ina\data\processed\features_68.parquet"
-output_dir = r"rul_ina/analisis_features/spectrum"
-os.makedirs(output_dir, exist_ok=True)
+# ============================================================
+# RUTAS
+# ============================================================
 
-print(f"Cargando datos desde: {input_path}")
-df = pd.read_parquet(input_path)
+INPUT_FILE = Path(
+    r"C:\Users\a\Downloads\CursoDL\rul_ina\data\processed\features_68.parquet"
+)
 
-# Obtener la lista ordenada de los rodamientos
-bearing_ids = sorted(df['bearing_id'].unique())
-print(f"Se encontraron {len(bearing_ids)} rodamientos.")
+OUTPUT_DIR = Path(
+    r"C:\Users\a\Downloads\CursoDL\rul_ina\analisis_features\spectrum"
+)
 
-# 2. Identificar las características espectrales de forma robusta
-# Excluimos rodamientos, tiempo, cycle, RMS y wavelets (WPD)
-exclude_terms = ['WPD', 'RMS', 'bearing_id', 'time_seconds', 'cycle']
-spectral_cols = [c for c in df.columns if not any(term in c for term in exclude_terms)]
 
-# Separar por canal H y V
-spectral_cols_h = sorted([c for c in spectral_cols if '_H' in c])
-spectral_cols_v = sorted([c for c in spectral_cols if '_V' in c])
+# ============================================================
+# CONFIGURACIÓN
+# ============================================================
 
-# Tomar los primeros 10 de cada uno (o los que correspondan al espectro, típicamente 5 por canal o 10 por canal)
-# Dividimos en bloques de 5 features por grilla
-blocks_h = [spectral_cols_h[:5], spectral_cols_h[5:10]] if len(spectral_cols_h) >= 10 else [spectral_cols_h[:5]]
-blocks_v = [spectral_cols_v[:5], spectral_cols_v[5:10]] if len(spectral_cols_v) >= 10 else [spectral_cols_v[:5]]
+SPECTRAL_FEATURES = [
+    "SpectralCentroid",
+    "SpectralRMS",
+    "SpectralStd",
+    "SpectralEntropy",
+    "SpectralFlatness",
+]
 
-print(f"Features espectrales H detectadas ({len(spectral_cols_h)}): {spectral_cols_h}")
-print(f"Features espectrales V detectadas ({len(spectral_cols_v)}): {spectral_cols_v}")
+AXES = {
+    "H": [f"{feature}_H" for feature in SPECTRAL_FEATURES],
+    "V": [f"{feature}_V" for feature in SPECTRAL_FEATURES],
+}
 
-# Función para generar la grilla 17 filas (rodamientos) x 5 columnas (features)
-def generar_grilla_espectral(canal_nombre, bloque_features, numero_bloque):
-    if not bloque_features:
-        print(f"Bloque {numero_bloque} para canal {canal_nombre} está vacío. Saltando...")
-        return
-        
-    fig, axes = plt.subplots(17, len(bloque_features), figsize=(4 * len(bloque_features), 34), sharex=False, sharey=False)
-    
-    # Asegurar que axes sea bidimensional incluso si len(bloque_features) == 1
-    if len(bloque_features) == 1:
-        axes = np.expand_dims(axes, axis=1)
+N_ROWS = 17
+N_COLS = 5
+DPI = 200
 
-    for row_idx, b_id in enumerate(bearing_ids):
-        df_b = df[df['bearing_id'] == b_id].sort_values('time_seconds')
-        
-        for col_idx, feat in enumerate(bloque_features):
-            ax = axes[row_idx, col_idx]
-            
-            # Graficar la feature bruta en el tiempo sin escalar
-            if len(df_b) > 0 and feat in df_b.columns:
-                ax.plot(df_b['time_seconds'], df_b[feat], color='darkcyan' if canal_nombre=='H' else 'darkorange', linewidth=0.9)
-            
-            # Títulos y etiquetas de ejes
-            if row_idx == 0:
-                ax.set_title(f'{feat}', fontsize=9, fontweight='bold')
-            if col_idx == 0:
-                ax.set_ylabel(f'{b_id}', fontsize=8, fontweight='bold')
-                
-            ax.tick_params(axis='both', which='major', labelsize=7)
-            ax.grid(True, linestyle='--', alpha=0.5)
 
-    fig.suptitle(f'Espectral - Canal {canal_nombre} (Bloque {numero_bloque}) | 17 Rodamientos x {len(bloque_features)} Features', fontsize=16, fontweight='bold', y=0.99)
-    plt.tight_layout(rect=[0, 0, 1, 0.99])
-    
-    output_file = os.path.join(output_dir, f"spectrum_canal_{canal_nombre}_bloque_{numero_bloque}_17x5.png")
-    plt.savefig(output_file, dpi=300)
-    plt.close()
-    print(f"Guardado exitosamente: {output_file}")
+# ============================================================
+# LECTURA Y VALIDACIÓN
+# ============================================================
 
-# 3. Generar las imágenes maestras en la carpeta spectrum corregida
-for idx, bloque in enumerate(blocks_h, 1):
-    generar_grilla_espectral('H', bloque, idx)
+def main():
+    if not INPUT_FILE.exists():
+        raise FileNotFoundError(
+            f"No se encontró el archivo:\n{INPUT_FILE}"
+        )
 
-for idx, bloque in enumerate(blocks_v, 1):
-    generar_grilla_espectral('V', bloque, idx)
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-print("\n¡Proceso de la familia espectral en la carpeta spectrum finalizado con éxito!")
+    df = pd.read_parquet(INPUT_FILE)
+
+    required_columns = {
+        "bearing_id",
+        "time_seconds",
+        *AXES["H"],
+        *AXES["V"],
+    }
+
+    missing = required_columns.difference(df.columns)
+
+    if missing:
+        raise ValueError(
+            f"Faltan columnas en el Parquet: {sorted(missing)}"
+        )
+
+    df["time_hours"] = df["time_seconds"] / 3600.0
+
+    bearings = sorted(df["bearing_id"].dropna().unique())
+
+    if len(bearings) != N_ROWS:
+        raise ValueError(
+            f"Se esperaban {N_ROWS} rodamientos, "
+            f"pero se encontraron {len(bearings)}: {bearings}"
+        )
+
+    # ========================================================
+    # GENERACIÓN DE LAS DOS IMÁGENES
+    # ========================================================
+
+    for axis, features in AXES.items():
+
+        fig, axes = plt.subplots(
+            nrows=N_ROWS,
+            ncols=N_COLS,
+            figsize=(22, 42),
+            sharex=False,
+            squeeze=False,
+        )
+
+        fig.suptitle(
+            f"Spectral Features - Axis {axis}",
+            fontsize=20,
+            fontweight="bold",
+            y=0.999,
+        )
+
+        for row, bearing in enumerate(bearings):
+            bearing_df = (
+                df[df["bearing_id"] == bearing]
+                .sort_values("time_hours")
+            )
+
+            for col, feature in enumerate(features):
+                ax = axes[row, col]
+
+                ax.plot(
+                    bearing_df["time_hours"],
+                    bearing_df[feature],
+                    linewidth=0.7,
+                )
+
+                if row == 0:
+                    ax.set_title(
+                        SPECTRAL_FEATURES[col],
+                        fontsize=10,
+                    )
+
+                if col == 0:
+                    ax.set_ylabel(
+                        f"{bearing}\nValor",
+                        fontsize=8,
+                    )
+
+                if row == N_ROWS - 1:
+                    ax.set_xlabel("Tiempo (horas)", fontsize=8)
+
+                ax.tick_params(axis="both", labelsize=7)
+                ax.grid(True, alpha=0.3)
+
+        fig.tight_layout(rect=[0, 0, 1, 0.997])
+
+        output_file = OUTPUT_DIR / f"spectrum_{axis}.png"
+
+        fig.savefig(
+            output_file,
+            dpi=DPI,
+            bbox_inches="tight",
+        )
+
+        plt.close(fig)
+
+        print(f"Imagen guardada: {output_file}")
+
+    print("\nProceso terminado correctamente.")
+
+
+if __name__ == "__main__":
+    main()
