@@ -184,3 +184,24 @@ Los 17 son run-to-failure; opciones: RUL lineal en tiempo, fracción de vida [0,
 - Subsets pequeños (`features_6`) y descomposición de aportes de MD².  
 - Arquitectura de redes y despliegue en Raspberry Pi 4B (validación real posterior).  
 - Objetivo de cadena: **features depuradas → HI/MD → modelo RUL → edge**.
+
+Resumen: gráficos colectivos de features suavizadas
+- Archivo de entrada: data/processed/features_48_suavizado.parquet, con 48 features suavizadas y 17 rodamientos.
+- Método: normalizar cada feature por rodamiento mediante Min-Max, interpolar su vida útil a 101 puntos (0–100 %) y calcular la mediana y la banda de dispersión entre los percentiles 25–75.
+- Gráficos propuestos: 4 imágenes PNG:
+  1. Features temporales y espectrales: 7 columnas × 2 filas (H y V).
+  2. Features cruzadas: Pearson_HV y EnergyRatio_HV, una sobre otra.
+  3. Las 16 wavelets del eje H, en una cuadrícula 4 × 4.
+  4. Las 16 wavelets del eje V, en una cuadrícula 4 × 4.
+- Salida: analisis_features\suavizado_moderado.
+¿Qué falta?
+El código entregado genera las imágenes, pero no crea un Parquet con los datos normalizados e interpolados ni con los resultados agregados.
+Conviene guardar un nuevo archivo, por ejemplo:
+analisis_features\suavizado_moderado\resumen_features_normalizadas.parquet
+Podría contener, para cada feature y porcentaje de vida útil (101 puntos):
+- Mediana entre rodamientos.
+- Percentil 25.
+- Percentil 75.
+- Media y desviación estándar, opcionalmente.
+También sería útil guardar otro Parquet con las series normalizadas de cada rodamiento. Así podrías reproducir los gráficos, comparar features y realizar análisis posteriores sin repetir la interpolación.
+Importante: ambos archivos serían nuevos; el Parquet original permanecería intacto.
