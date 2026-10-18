@@ -18,15 +18,15 @@ OUTPUT_DIR = Path(
     r"C:\Users\a\Downloads\CursoDL\rul_ina\analisis_features\redundancy"
 )
 
-CSV_FILE = OUTPUT_DIR / "features_similares.csv"
-PNG_FILE = OUTPUT_DIR / "features_similares.png"
+CSV_FILE = OUTPUT_DIR / "features_similares_V2.csv"
+PNG_FILE = OUTPUT_DIR / "features_similares_V2.png"
 
 
 # ============================================================
 # CRITERIOS DE SIMILITUD
 # ============================================================
 
-SPEARMAN_THRESHOLD = 0.95
+SPEARMAN_THRESHOLD = 0.7
 
 # Proporción mínima de rodamientos que deben superar el umbral.
 MIN_BEARING_PROPORTION = 0.80

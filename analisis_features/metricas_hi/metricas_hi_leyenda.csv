@@ -1,8 +1,0 @@
-﻿Metrica,Definicion,Limite_inferior,Limite_superior,Mejor_direccion,Interpretacion,Precauciones
-Mon_sign,Abs(suma(sign(diff(X)))) / (N-1),0.0,1.0,Mayor,1 indica cambios predominantemente en una dirección.,"Los empates aportan cero al numerador, pero permanecen en el denominador."
-Mon_spearman,Abs(correlacion de Spearman entre X y tiempo),0.0,1.0,Mayor,1 indica relación monótona perfecta con el tiempo.,No distingue entre tendencia creciente y decreciente.
-Trend_pearson,Abs(correlacion de Pearson entre X y tiempo),0.0,1.0,Mayor,1 indica asociación lineal perfecta con el tiempo.,Una tendencia no lineal puede obtener un valor menor.
-Prognosability,exp(-std(valores finales) / abs(media inicial - media final)),0.0,1.0,Mayor,Un valor alto indica valores finales consistentes respecto al cambio entre estados inicial y final.,Se calcula entre rodamientos. Se usan ventanas inicial y final del 10 % como supuesto configurable.
-Robustness,Media de exp(-abs(X-EWMA(X))/abs(X)),0.0,1.0,"Mayor, con cautela",Mayor cercanía a la tendencia EWMA según la desviación relativa definida.,Depende de alpha y de la escala de X. Se usa un denominador mínimo para evitar división por cero. Valores altos no garantizan un buen HI.
-Rob_rango_entre_alphas,Máxima mediana de Robustness menos mínima mediana entre los cinco alphas.,0.0,1.0,Menor,Un rango pequeño indica menor sensibilidad a la elección de alpha.,No es una métrica estándar de calidad del HI; es un indicador de sensibilidad.
-Parametros del analisis,"ALPHAS=[0.05, 0.1, 0.2, 0.3, 0.5]; ONSET_FRACTION=0.1; FAILURE_FRACTION=0.1",,,No aplica,Los resultados dependen de estas decisiones.,Los límites teóricos no constituyen umbrales universales para declarar una feature buena.
