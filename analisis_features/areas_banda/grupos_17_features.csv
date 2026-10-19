@@ -1,0 +1,18 @@
+grupo,posicion_en_grupo,feature,area
+Suben,1,RMS_H,0.09970724864643042
+Suben,2,RMS_V,0.1090505826785167
+Suben,3,Kurtosis_H,0.1431298033368998
+Suben,4,Kurtosis_V,0.15262610933187581
+Suben,5,CrestFactor_V,0.1561456837000898
+Suben,6,SpectralStd_H,0.18618286262771544
+Suben,7,CrestFactor_H,0.2139141083620143
+Bajan,1,WPD_Erel_5_H,0.22408184976927842
+Bajan,2,WPD_Erel_3_H,0.26251760420495085
+Bajan,3,WPD_Erel_6_H,0.26335013073225716
+Bajan,4,Skewness_H,0.27384803809221464
+Bajan,5,WPD_Erel_5_V,0.2951243293474038
+Bajan,6,WPD_Erel_4_H,0.3065397155007937
+Suben y bajan (cambian de sentido),1,WPD_Erel_3_V,0.24320148721250615
+Suben y bajan (cambian de sentido),2,WPD_Erel_12_V,0.24594797596290868
+Suben y bajan (cambian de sentido),3,WPD_Erel_4_V,0.26775607708262117
+Suben y bajan (cambian de sentido),4,WPD_Erel_11_V,0.2987240414628293
