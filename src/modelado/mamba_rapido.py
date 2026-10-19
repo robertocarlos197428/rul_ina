@@ -52,7 +52,7 @@ BASELINE_ERRORES = (
 
 # Datos
 LONG_SECUENCIA = 50        # rafagas por ventana
-VENTANA_SUAVIZADO = 1      # 1 = sin suavizar; N>1 = media causal de N rafagas
+VENTANA_SUAVIZADO = 10     # 1 = sin suavizar; N>1 = media causal de N rafagas
 
 # Modelo (pequeno, pensado para una Raspberry Pi 5)
 D_MODEL = 32
