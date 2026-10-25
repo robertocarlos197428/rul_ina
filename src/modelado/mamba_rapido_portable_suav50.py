@@ -70,7 +70,7 @@ BASELINE_ERRORES = (
 
 # Datos
 LONG_SECUENCIA = 50        # rafagas por ventana
-VENTANA_SUAVIZADO = 10     # 1 = sin suavizar; N>1 = media causal de N rafagas
+VENTANA_SUAVIZADO = 49     # 1 = sin suavizar; N>1 = media causal de N rafagas
 
 # Modelo (pequeno, pensado para una Raspberry Pi 5)
 D_MODEL = 32
@@ -90,20 +90,15 @@ SEMILLA = 42
 N_HILOS = None             # None = los que use PyTorch por defecto
 
 # Para una prueba rapida: entrenar solo los primeros N rodamientos de prueba
-LIMITE_RODAMIENTOS = 6  # None = los 17
+LIMITE_RODAMIENTOS = None  # None = los 17
 
 BEARING_COL = "bearing_id"
 TIME_COL = "time_seconds"
 TARGET_COL = "rul_frac"
 
 FEATURES = [
-    "RMS_H", "RMS_V",
-    "Kurtosis_H", "Kurtosis_V",
-    "CrestFactor_H", "CrestFactor_V",
     "SpectralStd_H",
-    "WPD_Erel_5_H", "WPD_Erel_3_H", "WPD_Erel_6_H",
-    "Skewness_H",
-    "WPD_Erel_5_V", "WPD_Erel_4_H",
+    "WPD_Erel_5_H", "WPD_Erel_3_H", 
 ]
 
 DPI = 150
